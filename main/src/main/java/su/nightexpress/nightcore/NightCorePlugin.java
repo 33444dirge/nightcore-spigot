@@ -143,32 +143,32 @@ public interface NightCorePlugin extends Plugin {
 
     @Deprecated
     default void runTask(@NotNull Consumer<BukkitTask> consumer) {
-        this.getScheduler().runTask(this, consumer);
+        this.scheduler().runTask(() -> consumer.accept(null));
     }
 
     @Deprecated
     default void runTaskAsync(@NotNull Consumer<BukkitTask> consumer) {
-        this.getScheduler().runTaskAsynchronously(this, consumer);
+        this.scheduler().runTaskAsync(() -> consumer.accept(null));
     }
 
     @Deprecated
     default void runTaskLater(@NotNull Consumer<BukkitTask> consumer, long delay) {
-        this.getScheduler().runTaskLater(this, consumer, delay);
+        this.scheduler().runTaskLater(() -> consumer.accept(null), delay);
     }
 
     @Deprecated
     default void runTaskLaterAsync(@NotNull Consumer<BukkitTask> consumer, long delay) {
-        this.getScheduler().runTaskLaterAsynchronously(this, consumer, delay);
+        this.scheduler().runTaskLaterAsync(() -> consumer.accept(null), delay);
     }
 
     @Deprecated
     default void runTaskTimer(@NotNull Consumer<BukkitTask> consumer, long delay, long interval) {
-        this.getScheduler().runTaskTimer(this, consumer, delay, interval);
+        this.scheduler().runTaskTimer(() -> consumer.accept(null), delay, interval);
     }
 
     @Deprecated
     default void runTaskTimerAsync(@NotNull Consumer<BukkitTask> consumer, long delay, long interval) {
-        this.getScheduler().runTaskTimerAsynchronously(this, consumer, delay, interval);
+        this.scheduler().runTaskTimerAsync(() -> consumer.accept(null), delay, interval);
     }
 
     @NotNull

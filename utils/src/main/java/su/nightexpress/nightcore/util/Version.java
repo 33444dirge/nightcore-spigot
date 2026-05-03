@@ -154,6 +154,7 @@ public enum Version {
     }
 
     private static boolean checkFolia() {
-        return Reflex.classExists("io.papermc.paper.threadedregions.RegionizedServer");
+        return Reflex.classExists("io.papermc.paper.threadedregions.RegionizedServer") || 
+               Reflex.classExists("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
     }
 }

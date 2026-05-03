@@ -39,7 +39,7 @@ public class NightTask {
         return createTask(plugin, () -> {
             if (interval <= 0) return null;
 
-            return plugin.scheduler().runTaskTimer(() -> CompletableFuture.runAsync(runnable), 0L, interval);
+            return plugin.scheduler().runTaskTimerAsync(runnable, 0L, interval);
         });
     }
 
