@@ -317,6 +317,13 @@
             <version>5.25.7.19</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.momirealms</groupId>
+            <artifactId>craft-engine-bukkit</artifactId>
+            <version>26.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/craft-engine-paper-plugin-26.5-SNAPSHOT.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
