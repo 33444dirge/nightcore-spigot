@@ -125,14 +125,14 @@ public class SpigotBossBar implements NightBossBar {
     @Override
     @NotNull
     public SpigotBossBar addViewer(@NotNull Player viewer) {
-        this.backend.removePlayer(viewer);
+        this.backend.addPlayer(viewer);
         return this;
     }
 
     @Override
     @NotNull
     public SpigotBossBar removeViewer(@NotNull Player viewer) {
-        this.backend.addPlayer(viewer);
+        this.backend.removePlayer(viewer);
         return this;
     }
 
