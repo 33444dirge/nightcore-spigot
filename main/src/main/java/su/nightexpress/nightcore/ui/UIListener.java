@@ -31,8 +31,9 @@ public class UIListener extends AbstractListener<NightCore> {
     }
 
     private void handleDialogInput(@NonNull Player player, @NonNull Dialog dialog, @NonNull DialogInput input) {
-        // Jump back to the main thread from async chat thread.
-        this.plugin.runTask(() -> {
+        // Inventory operations must run on the player's owning thread on Folia.
+        this.plugin.runTask(player, () -> {
+            if (DialogManager.getDialog(player) != dialog) return;
             if (input.getTextRaw().equalsIgnoreCase(DialogManager.EXIT) || dialog.getHandler().handle(input)) {
                 DialogManager.stopDialog(player);
             }

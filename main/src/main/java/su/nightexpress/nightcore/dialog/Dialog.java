@@ -3,6 +3,7 @@ package su.nightexpress.nightcore.dialog;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import su.nightexpress.nightcore.NightCore;
 import su.nightexpress.nightcore.core.CoreLang;
 import su.nightexpress.nightcore.menu.api.Menu;
 import su.nightexpress.nightcore.menu.impl.AbstractMenu;
@@ -15,6 +16,7 @@ import su.nightexpress.nightcore.util.text.TextRoot;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static su.nightexpress.nightcore.util.text.tag.Tags.*;
@@ -33,7 +35,7 @@ public class Dialog {
 
     private Menu         lastMenu;
     private List<String> suggestions;
-    private long         timeoutDate;
+    private volatile long timeoutDate;
 
     public Dialog(@NonNull Player player, @NonNull DialogHandler handler) {
         this.player = player;
@@ -176,9 +178,18 @@ public class Dialog {
     }
 
     public static void checkTimeOut() {
+        checkTimeOut((player, task) -> NightCore.get().runTask(player, task));
+    }
+
+    static void checkTimeOut(@NonNull BiConsumer<Player, Runnable> scheduler) {
         new HashSet<>(DIALOG_MAP.values()).forEach(dialog -> {
             if (dialog.isTimedOut()) {
-                stop(dialog.player);
+                scheduler.accept(dialog.player, () -> {
+                    // A queued timeout must not close a replacement or renewed dialog.
+                    if (get(dialog.player) == dialog && dialog.isTimedOut()) {
+                        stop(dialog.player);
+                    }
+                });
             }
         });
     }

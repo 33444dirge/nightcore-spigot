@@ -36,7 +36,8 @@ public class DialogListener extends AbstractListener<NightCore> {
 
         WrappedInput input = new WrappedInput(event);
 
-        this.plugin.runTask(() -> {
+        this.plugin.runTask(player, () -> {
+            if (Dialog.get(player) != dialog) return;
             if (input.getTextRaw().equalsIgnoreCase(Dialog.EXIT) || dialog.getHandler().onInput(dialog, input)) {
                 Dialog.stop(player);
             }
@@ -64,7 +65,8 @@ public class DialogListener extends AbstractListener<NightCore> {
         AsyncPlayerChatEvent chatEvent = new AsyncPlayerChatEvent(true, player, text, new HashSet<>());
         WrappedInput input = new WrappedInput(chatEvent);
 
-        this.plugin.runTask(() -> {
+        this.plugin.runTask(player, () -> {
+            if (Dialog.get(player) != dialog) return;
             if (input.getTextRaw().equalsIgnoreCase(Dialog.EXIT) || dialog.getHandler().onInput(dialog, input)) {
                 Dialog.stop(player);
             }

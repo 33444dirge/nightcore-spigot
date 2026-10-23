@@ -3,6 +3,7 @@ package su.nightexpress.nightcore.ui.dialog;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import su.nightexpress.nightcore.NightCore;
 import su.nightexpress.nightcore.core.CoreLang;
 import su.nightexpress.nightcore.ui.menu.Menu;
 import su.nightexpress.nightcore.ui.menu.MenuRegistry;
@@ -13,13 +14,14 @@ import su.nightexpress.nightcore.util.bridge.wrapper.ClickEventType;
 import su.nightexpress.nightcore.util.time.TimeFormats;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
 @Deprecated
 public class DialogManager {
 
-    private static final Map<UUID, Dialog> DIALOG_MAP = new HashMap<>();
+    private static final Map<UUID, Dialog> DIALOG_MAP = new ConcurrentHashMap<>();
 
     public static final String EXIT   = "#exit";
     public static final String VALUES = "#values";
@@ -34,7 +36,11 @@ public class DialogManager {
     }
 
     public static void tickDialogs() {
-        getDialogs().forEach(DialogManager::tickDialog);
+        getDialogs().forEach(dialog -> NightCore.get().runTask(dialog.getPlayer(), () -> {
+            if (getDialog(dialog.getPlayer()) == dialog) {
+                tickDialog(dialog);
+            }
+        }));
     }
 
     private static void tickDialog(@NonNull Dialog dialog) {
