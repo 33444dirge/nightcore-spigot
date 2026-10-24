@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -79,6 +80,10 @@ import su.nightexpress.nightcore.util.text.night.tag.TagPool;
 
 @NullMarked
 public class PaperBridge implements Software {
+
+    // Paper removed UnsafeValues.nextEntityId(). These IDs are only used for
+    // packet-only entities, so allocate a thread-safe range independent of Bukkit.
+    private static final AtomicInteger NEXT_FAKE_ENTITY_ID = new AtomicInteger(Integer.MAX_VALUE);
 
     private DialogAdapter<?>          dialogAdapter;
     private PaperTextComponentAdapter textComponentAdapter;
@@ -154,10 +159,9 @@ public class PaperBridge implements Software {
         player.showDialog((DialogLike) this.dialogAdapter.adaptDialog(dialog));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public int nextEntityId() {
-        return Bukkit.getUnsafe().nextEntityId();
+        return NEXT_FAKE_ENTITY_ID.getAndUpdate(id -> id == Integer.MIN_VALUE ? Integer.MAX_VALUE : id - 1);
     }
 
 

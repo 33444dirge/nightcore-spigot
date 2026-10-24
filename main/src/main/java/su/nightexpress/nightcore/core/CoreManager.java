@@ -1,5 +1,6 @@
 package su.nightexpress.nightcore.core;
 
+import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 import su.nightexpress.nightcore.NightCore;
 import su.nightexpress.nightcore.bridge.item.ItemAdapter;
@@ -123,10 +124,24 @@ public class CoreManager extends AbstractManager<NightCore> {
     private void tickMenus() {
         new HashSet<>(AbstractMenu.PLAYER_MENUS.values()).forEach(menu -> {
             if (menu.getOptions().isReadyToRefresh()) {
-                menu.flush();
+                // Inventory and player operations must run on the owning
+                // entity thread on Folia. The session is checked when the
+                // queued task runs, because it may have closed or changed.
+                menu.getViewers().forEach(viewer -> this.plugin.runTask(viewer.getPlayer(), () -> refreshMenuIfCurrent(menu, viewer)));
                 menu.getOptions().setLastAutoRefresh(System.currentTimeMillis());
             }
         });
         MenuRegistry.getViewers().stream().map(MenuViewer::getMenu).distinct().forEach(Menu::tick);
+    }
+
+    static void refreshMenuIfCurrent(su.nightexpress.nightcore.menu.api.Menu menu,
+                                     su.nightexpress.nightcore.menu.MenuViewer viewer) {
+        Player player = viewer.getPlayer();
+        if (AbstractMenu.getMenu(player) != menu) return;
+        if (menu.getViewer(player) != viewer) return;
+        if (!viewer.hasInventory()) return;
+        if (player.getOpenInventory().getTopInventory() != viewer.getInventory()) return;
+
+        menu.flush(viewer);
     }
 }

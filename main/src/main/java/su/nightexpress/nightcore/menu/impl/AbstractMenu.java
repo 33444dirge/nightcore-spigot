@@ -23,11 +23,12 @@ import su.nightexpress.nightcore.menu.item.MenuItem;
 import su.nightexpress.nightcore.util.Lists;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Deprecated
 public abstract class AbstractMenu<P extends NightCorePlugin> implements Menu {
 
-    public static final Map<UUID, Menu> PLAYER_MENUS = new HashMap<>();
+    public static final Map<UUID, Menu> PLAYER_MENUS = new ConcurrentHashMap<>();
 
     public static void closeAll() {
         getActiveMenus().forEach(Menu::close);
@@ -79,8 +80,8 @@ public abstract class AbstractMenu<P extends NightCorePlugin> implements Menu {
         this.plugin = plugin;
         this.id = UUID.randomUUID();
         this.options = new MenuOptions(options);
-        this.viewers = new HashMap<>();
-        this.items = new HashSet<>();
+        this.viewers = new ConcurrentHashMap<>();
+        this.items = ConcurrentHashMap.newKeySet();
     }
 
     @Nullable

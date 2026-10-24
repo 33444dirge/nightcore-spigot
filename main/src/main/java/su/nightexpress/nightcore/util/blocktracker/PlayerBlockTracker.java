@@ -7,6 +7,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.PistonMoveReaction;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import su.nightexpress.nightcore.Engine;
@@ -118,23 +119,30 @@ public final class PlayerBlockTracker {
     }
 
     public static void shift(@NonNull BlockFace direction, @NonNull List<Block> blocks) {
-        //unTrack(blocks);
-        //track(blocks.stream().map(block -> block.getRelative(direction)).toList());
-
+        // Snapshot tracked state before any change, so adjacent blocks in the chain don't leak marks into each other.
+        Set<Block> toClear = new HashSet<>();
         Set<Block> toTrack = new HashSet<>();
-        Set<Block> toUntrack = new HashSet<>();
 
         blocks.forEach(block -> {
-            if (isTracked(block)) {
-                toTrack.add(block.getRelative(direction));
+            toClear.add(block);
+
+            // A block broken by the piston has no destination to clear.
+            if (block.getPistonMoveReaction() == PistonMoveReaction.BREAK) {
+                return;
             }
-            else {
-                toUntrack.add(block.getRelative(direction));
+
+            Block target = block.getRelative(direction);
+            toClear.add(target);
+
+            if (isTracked(block)) {
+                toTrack.add(target);
             }
         });
 
-        toTrack.forEach(PlayerBlockTracker::track);
-        toUntrack.forEach(PlayerBlockTracker::unTrack);
+        // Clear sources and targets first, then restore marks at the new positions.
+        // trackForce: the block was already accepted by filters when placed, and the target still holds the old block at this point.
+        toClear.forEach(PlayerBlockTracker::unTrack);
+        toTrack.forEach(PlayerBlockTracker::trackForce);
     }
 
     public static void move(@NonNull Block from, @NonNull Block to) {

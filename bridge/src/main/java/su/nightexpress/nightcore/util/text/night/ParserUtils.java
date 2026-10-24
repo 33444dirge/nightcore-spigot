@@ -210,6 +210,11 @@ public class ParserUtils {
 
     @NonNull
     public static String wrapHexCodesAsTags(@NonNull String str) {
+        // Accept common legacy hex forms (&#RRGGBB and &#RRGGBB>) alongside
+        // MiniMessage (<#RRGGBB). Only valid six-digit markers are changed,
+        // so normal ampersand legacy colors such as &a remain untouched.
+        str = str.replaceAll("&<?(#(?i:[0-9a-f]{6}))(?:>)?", "<$1>");
+
         StringBuilder builder = new StringBuilder(str);
 
         int index;

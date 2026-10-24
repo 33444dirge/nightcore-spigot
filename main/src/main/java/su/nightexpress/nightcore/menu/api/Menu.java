@@ -21,7 +21,10 @@ public interface Menu {
     void clear();
 
     default void flush() {
-        this.getViewers().forEach(this::flush);
+        // Refreshing a viewer may open/close the menu and mutate the viewer
+        // collection. Iterate over a stable snapshot so that a refresh cannot
+        // invalidate the iterator currently being used here.
+        this.getViewers().stream().toList().forEach(this::flush);
     }
 
     default void flush(@NonNull MenuViewer viewer) {
