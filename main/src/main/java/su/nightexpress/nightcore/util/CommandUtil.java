@@ -1,8 +1,11 @@
 package su.nightexpress.nightcore.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
+import org.bukkit.command.FormattedCommandAlias;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
+import org.bukkit.help.GenericCommandHelpTopic;
 import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -15,6 +18,8 @@ import su.nightexpress.nightcore.util.bridge.Software;
 import java.util.*;
 
 public class CommandUtil {
+
+    private static final Map<String, FormattedCommandAlias> HELP_TEXTS = new HashMap<>();
 
     @NonNull
     private static SimpleCommandMap getCommandMap() {
@@ -34,7 +39,40 @@ public class CommandUtil {
     }
 
     public static boolean register(@NonNull Command command, @NonNull String fallbackPrefix) {
-        return getCommandMap().register(fallbackPrefix, command);
+        boolean registered = getCommandMap().register(fallbackPrefix, command);
+        FormattedCommandAlias text = HELP_TEXTS.get(command.getLabel());
+        if (text != null && command.isRegistered()) {
+            updateHelpText(text, command);
+            text.register(getCommandMap());
+        }
+        return registered;
+    }
+
+    private static void updateHelpText(@NonNull FormattedCommandAlias text, @NonNull Command command) {
+        text.setDescription(command.getDescription());
+        text.setUsage(command.getUsage());
+        text.setPermission(command.getPermission());
+        text.setAliases(new ArrayList<>(command.getAliases()));
+    }
+
+    private static void unregisterHelpText(@NonNull Command command, @NonNull String label) {
+        var topic = Bukkit.getHelpMap().getHelpTopic("/" + label);
+        if (topic == null || topic.getClass() != GenericCommandHelpTopic.class) return;
+
+        FormattedCommandAlias text = HELP_TEXTS.get(label);
+        if (Reflex.getFieldValue(topic, "command") == command) {
+            // Preserve the native topic, its text and indexes while releasing the retired command.
+            text = new FormattedCommandAlias(label, new String[0]);
+            updateHelpText(text, command);
+            if (!Reflex.setFieldValue(topic, "command", text)) return;
+            HELP_TEXTS.put(label, text);
+        }
+        if (text != null) text.unregister(getCommandMap());
+    }
+
+    public static void clearHelpTexts() {
+        HELP_TEXTS.values().forEach(text -> text.unregister(getCommandMap()));
+        HELP_TEXTS.clear();
     }
 
     /*public static void syncCommands() {
@@ -55,9 +93,11 @@ public class CommandUtil {
 
     public static boolean unregister(@NonNull Command command) {
         SimpleCommandMap commandMap = getCommandMap();
+        String label = command.getLabel();
 
         Map<String, Command> knownCommands = Software.instance().getKnownCommands(commandMap);
         if (!command.unregister(commandMap)) return false;
+        unregisterHelpText(command, label);
 
         return knownCommands.keySet().removeIf(key -> key.equalsIgnoreCase(command.getName()) || command.getAliases()
             .contains(key));

@@ -96,8 +96,13 @@ public abstract class NightPlugin extends JavaPlugin implements NightCorePlugin 
 
     @Override
     public void onDisable() {
-        this.unloadManagers();
-        this.onShutdown();
+        try {
+            this.unloadManagers();
+            this.onShutdown();
+        }
+        finally {
+            NightCore.CHILDRENS.removeIf(child -> child == this);
+        }
     }
 
     protected boolean onInit() {
