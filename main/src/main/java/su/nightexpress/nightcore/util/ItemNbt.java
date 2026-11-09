@@ -59,7 +59,7 @@ public class ItemNbt {
         DataInputStream dataInput = new DataInputStream(inputStream);
 
         Object compoundTag = Reflex.invokeMethod(NBT_IO_READ, null, dataInput);
-        return compoundTag == null ? null : fromCompoundTag(compoundTag, Version.MC_1_21.getDataVersion());
+        return compoundTag == null ? null : NbtUtil.tagToItemStack(compoundTag);
     }
 
     @Deprecated
@@ -80,7 +80,7 @@ public class ItemNbt {
     @Nullable
     @Deprecated
     public static ItemStack fromTagString(@NonNull String tagString) {
-        return new ItemTag(tagString, Version.MC_1_21.getDataVersion()).getItemStack();
+        return NbtUtil.tagToItemStack(tagString);
     }
 
     @Nullable
@@ -129,9 +129,4 @@ public class ItemNbt {
         return NbtUtil.tagFromItemStack(bukkitStack);
     }
 
-    @Nullable
-    @Deprecated
-    private static ItemStack fromCompoundTag(@NonNull Object tag, int sourceVersion) {
-        return NbtUtil.tagToItemStack(tag, sourceVersion);
-    }
 }

@@ -42,6 +42,14 @@ public class NbtSerializer {
             null);
     }
 
+    @Nullable
+    public static Object decodeItemStackExact(@NonNull Object compoundTag) {
+        Object context = createSerializationContext();
+        DataResult<?> result = (DataResult<?>) Reflex.invokeMethod(DECODER_PARSE, ITEM_STACK_CODEC, context,
+            compoundTag);
+        return result == null ? null : result.result().orElse(null);
+    }
+
     @NonNull
     public static Object encodeItemStack(@NonNull Object nmsStack) {
         Object context = createSerializationContext();

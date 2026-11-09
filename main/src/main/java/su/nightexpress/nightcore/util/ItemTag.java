@@ -1,5 +1,6 @@
 package su.nightexpress.nightcore.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -38,7 +39,7 @@ public class ItemTag implements Writeable {
     public static ItemTag of(@NonNull ItemStack itemStack) {
         Object compoundTag = NbtUtil.tagFromItemStack(itemStack);
 
-        return new ItemTag(compoundTag.toString(), Version.getCurrent().getDataVersion());
+        return new ItemTag(compoundTag.toString(), Bukkit.getUnsafe().getDataVersion());
     }
 
     @NonNull

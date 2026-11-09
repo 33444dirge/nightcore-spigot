@@ -4,9 +4,9 @@ import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
+import org.bukkit.Bukkit;
 import org.jspecify.annotations.NonNull;
 import su.nightexpress.nightcore.util.Reflex;
-import su.nightexpress.nightcore.util.Version;
 
 import java.lang.reflect.Method;
 
@@ -29,9 +29,9 @@ public class DataFixerUtil {
     public static Object updateItemStack(@NonNull Object compoundTag, int sourceVersion) {
         if (DATA_FIXER == null) throw new IllegalStateException("DataFixer is null!");
 
-        int targetVersion = Version.getCurrent().getDataVersion();
+        int targetVersion = Bukkit.getUnsafe().getDataVersion();
         if (targetVersion <= 0) return compoundTag;
-        if (sourceVersion > targetVersion || sourceVersion <= 0) return compoundTag;
+        if (sourceVersion >= targetVersion || sourceVersion <= 0) return compoundTag;
 
         // Not necessary, but they used it for a reason probably.
         /*if (Version.isPaper()) {

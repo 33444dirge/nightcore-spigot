@@ -34,6 +34,7 @@ import su.nightexpress.nightcore.ui.dialog.DialogWatcher;
 import su.nightexpress.nightcore.ui.inventory.MenuRegistry;
 import su.nightexpress.nightcore.userdata.UserDataManager;
 import su.nightexpress.nightcore.util.ItemTag;
+import su.nightexpress.nightcore.util.CommandUtil;
 import su.nightexpress.nightcore.util.ItemUtil;
 import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.Plugins;
@@ -174,6 +175,7 @@ public class NightCore extends NightPlugin {
         this.chatManager.shutdown();
         if (this.currencyManager != null) this.currencyManager.shutdown();
 
+        CommandUtil.clearHelpTexts();
         CHILDRENS.clear();
         core = null;
     }

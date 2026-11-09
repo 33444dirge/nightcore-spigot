@@ -28,7 +28,7 @@ public enum Version {
     MC_26_1("26.1", 4786, Status.DROPPED),
     MC_26_1_1("26.1.1", 4788),
     MC_26_1_2("26.1.2", 4790),
-    MC_26_2("26.2", 4890), // TODO Predicted from snapshot 3
+    MC_26_2("26.2", 4903),
     UNKNOWN("Unknown", 10000),
     ;
 
